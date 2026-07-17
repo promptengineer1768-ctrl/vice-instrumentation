@@ -65,10 +65,7 @@ jobs:
             mingw-w64-x86_64-gtk3
             mingw-w64-x86_64-libpng
             mingw-w64-x86_64-zlib
-            mingw-w64-x86_64-libevdev
-            dos2unix
             flex
-            xa65
       - name: Configure and build
         run: |
           find . -type f -name '*.sh' -exec chmod +x {} +
@@ -99,7 +96,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install dependencies
-        run: brew install autoconf automake libtool pkg-config sdl2 libpng
+        run: brew install autoconf automake libtool pkg-config sdl2 libpng dos2unix flex
       - name: Configure and build
         run: |
           chmod +x configure
