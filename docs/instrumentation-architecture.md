@@ -4,8 +4,8 @@ Instrumentation is intentionally additive to the VICE 3.10 core.
 
 | Surface | Hook | Data exposed |
 | --- | --- | --- |
-| Keyboard | `monitor_binary.c`, command `0x74` | row, column, pressed; RESTORE pseudo-cells |
-| IEC | `iecbus_observer` after machine port resolution | CPU and per-drive resolved masks |
+| Keyboard | `monitor_binary.c`, command `0x74` | row, column, pressed; RESTORE pseudo-cells on keyboard machines |
+| IEC | `iecbus_observer` after machine port resolution | CPU and per-drive masks on C64, C64DTV, Plus/4, VIC-20 (not PET) |
 | C128 | `c128_get_timing_sample()` | clock, raster line/cycle, VIC half-cycle |
 | VDC | `vdc_get_timing_sample()` | clock, raster counters, busy deadline, draw state |
 

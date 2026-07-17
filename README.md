@@ -7,9 +7,11 @@ official VICE 3.10.0 source release. The pristine release is preserved in the
 ## Extensions
 
 - Binary-monitor command `0x74` injects a physical keyboard matrix transition,
-  including the C64/C128 RESTORE pseudo-cells. It requires monitor API v2.
-- IEC observers receive the resolved CPU and drive line masks after each port
-  recomputation.
+  including machine-specific RESTORE pseudo-cells. It requires monitor API v2
+  and covers C64, C128, VIC-20, Plus/4, C16, PET, CBM-II, CBM 5x0, C64DTV,
+  and SCPU64 targets.
+- IEC observers receive resolved CPU and drive line masks on C64, C64DTV,
+  Plus/4, and VIC-20. PET intentionally has no IEC observer hook.
 - `c128_get_timing_sample()` exposes C128 clock, raster line/cycle, and VIC
   half-cycle timing.
 - `vdc_get_timing_sample()` exposes VDC clock, raster position, internal memory
