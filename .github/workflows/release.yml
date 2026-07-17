@@ -59,6 +59,7 @@ jobs:
           update: true
           install: >-
             base-devel
+            p7zip
             autoconf
             automake
             git
