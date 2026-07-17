@@ -119,6 +119,9 @@ jobs:
         run: |
           find . -type f -name '*.sh' -exec chmod +x {} +
           chmod +x configure
+          mkdir -p "$HOME/bin"
+          ln -sf "$(brew --prefix automake)/bin/aclocal" "$HOME/bin/aclocal-1.16"
+          export PATH="$HOME/bin:$PATH"
           ./configure --without-libcurl --disable-gtk3 --disable-dependency-tracking
           make -j2
       - name: Package macOS binaries
