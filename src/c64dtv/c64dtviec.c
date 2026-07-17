@@ -58,6 +58,9 @@ void iec_update_ports(void)
     iecbus.drv_port = (((iecbus.cpu_port >> 4) & 0x4)
                        | (iecbus.cpu_port >> 7)
                        | ((iecbus.cpu_bus << 3) & 0x80));
+    if (iecbus_observer) {
+        iecbus_observer(&iecbus);
+    }
 }
 
 void iec_update_ports_embedded(void)

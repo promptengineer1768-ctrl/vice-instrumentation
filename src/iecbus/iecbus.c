@@ -57,6 +57,7 @@
 uint8_t (*iecbus_callback_read)(CLOCK) = NULL;
 void (*iecbus_callback_write)(uint8_t, CLOCK) = NULL;
 void (*iecbus_update_ports)(void) = NULL;
+iecbus_observer_t iecbus_observer = NULL;
 
 iecbus_t iecbus;
 
@@ -200,6 +201,11 @@ void iecbus_init(void)
     iecbus.drv_port = IECBUS_DEVICE_READ_DATA
                       | IECBUS_DEVICE_READ_CLK
                       | IECBUS_DEVICE_READ_ATN;
+}
+
+void iecbus_set_observer(iecbus_observer_t observer)
+{
+    iecbus_observer = observer;
 }
 
 void iecbus_cpu_undump(uint8_t data)

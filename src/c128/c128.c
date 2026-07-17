@@ -1335,6 +1335,17 @@ void machine_get_line_cycle(unsigned int *line, unsigned int *cycle, int *half_c
     *half_cycle = vicii_get_half_cycle();
 }
 
+void c128_get_timing_sample(c128_timing_sample_t *sample)
+{
+    if (sample == NULL) {
+        return;
+    }
+    sample->clock = maincpu_clk;
+    machine_get_line_cycle(&sample->raster_line,
+                           &sample->raster_cycle,
+                           &sample->half_cycle);
+}
+
 void machine_change_timing(int timeval, int powerfreq, int border_mode)
 {
     switch (timeval) {

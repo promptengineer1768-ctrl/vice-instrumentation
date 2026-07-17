@@ -98,4 +98,12 @@ int iecbus_device_write(unsigned int unit, uint8_t data);
 
 extern void (*iecbus_update_ports)(void);
 
+/* Optional observer for tooling that needs the resolved IEC bus state.
+ * The callback is invoked after iecbus_update_ports has recomputed cpu_port,
+ * drv_port, and the per-unit drive masks.  The pointer is valid only for the
+ * duration of the callback; copy it if the event must be retained. */
+typedef void (*iecbus_observer_t)(const iecbus_t *state);
+extern iecbus_observer_t iecbus_observer;
+void iecbus_set_observer(iecbus_observer_t observer);
+
 #endif

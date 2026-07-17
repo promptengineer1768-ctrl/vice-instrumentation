@@ -29,6 +29,8 @@
 #ifndef VICE_C128_H
 #define VICE_C128_H
 
+#include "types.h"
+
 #define C128_PAL_CYCLES_PER_SEC  985248
 #define C128_PAL_CYCLES_PER_LINE 63
 #define C128_PAL_SCREEN_LINES    312
@@ -67,6 +69,16 @@ typedef struct machine_context_s {
 } machine_context_t;
 
 extern machine_context_t machine_context;
+
+/* Deterministic timing sample for external debuggers/instrumentation. */
+typedef struct c128_timing_sample_s {
+    CLOCK clock;
+    unsigned int raster_line;
+    unsigned int raster_cycle;
+    int half_cycle;
+} c128_timing_sample_t;
+
+void c128_get_timing_sample(c128_timing_sample_t *sample);
 
 void machine_kbdbuf_reset_c128(void);
 void machine_kbdbuf_reset_c64(void);
