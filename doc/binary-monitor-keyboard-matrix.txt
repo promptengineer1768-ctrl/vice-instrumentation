@@ -1,0 +1,13 @@
+VICE 3.10 binary monitor extension: physical keyboard matrix input
+
+Command and response: 0x74 (MON_CMD_KEYBOARD_MATRIX / MON_RESPONSE_KEYBOARD_MATRIX)
+Minimum API version: 2
+
+Request body (3 bytes):
+  byte 0: signed row (-3 is RESTORE)
+  byte 1: column (0..7)
+  byte 2: pressed (zero release, nonzero press)
+
+Rows 0..15 address keyboard matrix rows.  RESTORE is row -3, column 0 or 1.
+The command uses VICE's normal keyboard event path, including asynchronous
+queueing and machine-specific RESTORE behavior.

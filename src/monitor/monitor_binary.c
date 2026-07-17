@@ -40,6 +40,7 @@
 #include "lib.h"
 #include "log.h"
 #include "kbdbuf.h"
+#include "keyboard.h"
 #include "monitor.h"
 #include "monitor_binary.h"
 #include "montypes.h"
@@ -105,6 +106,8 @@ enum t_binary_command {
     e_MON_CMD_ADVANCE_INSTRUCTIONS = 0x71,
     e_MON_CMD_KEYBOARD_FEED = 0x72,
     e_MON_CMD_EXECUTE_UNTIL_RETURN = 0x73,
+    /* Set one physical keyboard matrix cell (row, column, pressed). */
+    e_MON_CMD_KEYBOARD_MATRIX = 0x74,
 
     e_MON_CMD_PING = 0x81,
     e_MON_CMD_BANKS_AVAILABLE = 0x82,
@@ -154,6 +157,7 @@ enum t_binary_response {
     e_MON_RESPONSE_ADVANCE_INSTRUCTIONS = 0x71,
     e_MON_RESPONSE_KEYBOARD_FEED = 0x72,
     e_MON_RESPONSE_EXECUTE_UNTIL_RETURN = 0x73,
+    e_MON_RESPONSE_KEYBOARD_MATRIX = 0x74,
 
     e_MON_RESPONSE_PING = 0x81,
     e_MON_RESPONSE_BANKS_AVAILABLE = 0x82,
@@ -759,6 +763,48 @@ static void monitor_binary_process_keyboard_feed(binary_command_t *command)
     kbdbuf_feed((char *)&body[1]);
 
     monitor_binary_response(0, e_MON_RESPONSE_KEYBOARD_FEED, e_MON_ERR_OK, command->request_id, NULL);
+}
+
+/*
+ * Drive a physical keyboard matrix cell.  The row is signed so the
+ * existing negative-row pseudo cells (RESTORE, CAPS, etc.) can be addressed
+ * without inventing a second command.  Payload: int8 row, uint8 column,
+ * uint8 pressed.  This deliberately uses keyboard_set_keyarr_any(), which
+ * applies the normal event/queue semantics used by emulated input.
+ */
+static void monitor_binary_process_keyboard_matrix(binary_command_t *command)
+{
+    int row;
+    int col;
+    int pressed;
+
+    if (command->api_version < 0x02) {
+        monitor_binary_error(e_MON_ERR_CMD_INVALID_API_VERSION, command->request_id);
+        return;
+    }
+    if (command->length < 3) {
+        monitor_binary_error(e_MON_ERR_CMD_INVALID_LENGTH, command->request_id);
+        return;
+    }
+
+    row = (int)(signed char)command->body[0];
+    col = (int)command->body[1];
+    pressed = command->body[2] ? 1 : 0;
+
+    if ((row >= KBD_ROWS) || (row < -5) || (col >= KBD_COLS) || (col < 0)) {
+        monitor_binary_error(e_MON_ERR_INVALID_PARAMETER, command->request_id);
+        return;
+    }
+    /* Only the two RESTORE pseudo-cells are valid negative rows here. */
+    if (row < 0 && !(row == KBD_ROW_RESTORE_1 &&
+                     (col == KBD_COL_RESTORE_1 || col == KBD_COL_RESTORE_2))) {
+        monitor_binary_error(e_MON_ERR_INVALID_PARAMETER, command->request_id);
+        return;
+    }
+
+    keyboard_set_keyarr_any(row, col, pressed);
+    monitor_binary_response(0, e_MON_RESPONSE_KEYBOARD_MATRIX, e_MON_ERR_OK,
+                            command->request_id, NULL);
 }
 
 static void monitor_binary_process_execute_until_return(binary_command_t *command)
@@ -1809,6 +1855,8 @@ static void monitor_binary_process_command(unsigned char * pbuffer)
         monitor_binary_process_advance_instructions(&command);
     } else if (command_type == e_MON_CMD_KEYBOARD_FEED) {
         monitor_binary_process_keyboard_feed(&command);
+    } else if (command_type == e_MON_CMD_KEYBOARD_MATRIX) {
+        monitor_binary_process_keyboard_matrix(&command);
     } else if (command_type == e_MON_CMD_EXECUTE_UNTIL_RETURN) {
         monitor_binary_process_execute_until_return(&command);
 
