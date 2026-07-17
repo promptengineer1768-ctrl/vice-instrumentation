@@ -84,7 +84,8 @@ jobs:
           export PATH="$HOME/bin:$PATH"
           export ICONV=true
           ./configure --without-libcurl --disable-gtk3
-          sed -i '/ERROR: generated infocontrib.h contains content that is not valid iso-8859-x/,+1d' src/Makefile
+          find . -name Makefile -exec sed -i '/ERROR: generated infocontrib.h contains content that is not valid iso-8859-x/,+1d' {} +
+          touch Makefile src/Makefile
           make -j2
       - name: Package Windows binaries
         run: |
