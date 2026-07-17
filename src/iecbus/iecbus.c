@@ -29,6 +29,7 @@
 #include "vice.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cia.h"
@@ -41,6 +42,7 @@
 #include "types.h"
 #include "serial.h"
 #include "drive/iec/cmdhd.h"
+#include "maincpu.h"
 
 #ifdef DEBUG_IECBUS
 #include "log.h"
@@ -58,6 +60,36 @@ uint8_t (*iecbus_callback_read)(CLOCK) = NULL;
 void (*iecbus_callback_write)(uint8_t, CLOCK) = NULL;
 void (*iecbus_update_ports)(void) = NULL;
 iecbus_observer_t iecbus_observer = NULL;
+
+/* Optional process-local JSONL recorder for protocol experiments.  It is
+ * enabled with VICE_IEC_TRACE_FILE and deliberately copies the observer
+ * snapshot synchronously, preserving the callback lifetime contract. */
+static FILE *iecbus_trace_file;
+
+static void iecbus_trace_observer(const iecbus_t *state)
+{
+    unsigned int unit;
+
+    if (iecbus_trace_file == NULL || state == NULL) {
+        return;
+    }
+    fprintf(iecbus_trace_file,
+            "{\"clock\":%llu,\"cpu_bus\":%u,\"cpu_port\":%u,\"drv_port\":%u,\"fast1541\":%u,\"drv_bus\":[",
+            (unsigned long long)maincpu_clk,
+            (unsigned int)state->cpu_bus,
+            (unsigned int)state->cpu_port,
+            (unsigned int)state->drv_port,
+            (unsigned int)state->iec_fast_1541);
+    for (unit = 0; unit < IECBUS_NUM; unit++) {
+        fprintf(iecbus_trace_file, "%s%u", unit ? "," : "", (unsigned int)state->drv_bus[unit]);
+    }
+    fputs("] ,\"drv_data\":[", iecbus_trace_file);
+    for (unit = 0; unit < IECBUS_NUM; unit++) {
+        fprintf(iecbus_trace_file, "%s%u", unit ? "," : "", (unsigned int)state->drv_data[unit]);
+    }
+    fputs("]}\n", iecbus_trace_file);
+    fflush(iecbus_trace_file);
+}
 
 iecbus_t iecbus;
 
@@ -201,6 +233,16 @@ void iecbus_init(void)
     iecbus.drv_port = IECBUS_DEVICE_READ_DATA
                       | IECBUS_DEVICE_READ_CLK
                       | IECBUS_DEVICE_READ_ATN;
+
+    if (iecbus_trace_file == NULL) {
+        const char *path = getenv("VICE_IEC_TRACE_FILE");
+        if (path != NULL && *path != '\0') {
+            iecbus_trace_file = fopen(path, "wb");
+            if (iecbus_trace_file != NULL) {
+                iecbus_set_observer(iecbus_trace_observer);
+            }
+        }
+    }
 }
 
 void iecbus_set_observer(iecbus_observer_t observer)

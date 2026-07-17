@@ -1,0 +1,14 @@
+VICE IEC JSONL recorder
+=======================
+
+Set `VICE_IEC_TRACE_FILE` to a writable path before launching an instrumented
+VICE process.  The IEC observer then writes one JSON object per resolved-bus
+update.  Each record contains the emulated `clock`, host output/input state,
+the fast-1541 flag, and all sixteen `drv_bus`/`drv_data` entries.  The file is
+flushed after every record so a timeout or crash leaves an auditable prefix.
+
+This is a VICE-side recorder, not a host wall-clock trace.  The callback copies
+the observer state synchronously; consumers must treat each JSONL line as an
+immutable snapshot.  `drv_bus` and `drv_data` entries are indexed by IEC unit
+number (8 through 11 are the normal drive slots).  The recorder is disabled
+when the environment variable is absent.
