@@ -74,7 +74,17 @@ static inline void resolve_bus_signals(void)
 
 void iec_update_ports(void)
 {
-    /* Not used for now.  */
+    /* VIC-20 uses a local IEC resolver rather than iecbus_update_ports().
+       Mirror its resolved lines into the common observer snapshot. */
+    iecbus.cpu_bus = (uint8_t)((cpu_clock ? IECBUS_DEVICE_WRITE_CLK : 0)
+                               | (cpu_data ? IECBUS_DEVICE_WRITE_DATA : 0));
+    iecbus.cpu_port = (uint8_t)((bus_clock ? IECBUS_DEVICE_READ_CLK : 0)
+                                | (bus_data ? IECBUS_DEVICE_READ_DATA : 0)
+                                | (bus_atn ? IECBUS_DEVICE_READ_ATN : 0));
+    iecbus.drv_port = iecbus.cpu_port;
+    if (iecbus_observer) {
+        iecbus_observer(&iecbus);
+    }
 }
 
 void vic20iec_init(void)

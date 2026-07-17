@@ -23,6 +23,13 @@ def test_iec_observer_contract():
     assert "iecbus_observer(&iecbus)" in source
 
 
+def test_vic20_iec_observer_contract_without_pet_hook():
+    vic20 = read("src/vic20/vic20iec.c")
+    pet = read("src/pet/petiec.c")
+    assert "iecbus_observer(&iecbus)" in vic20
+    assert "iecbus_observer(&iecbus)" not in pet
+
+
 def test_c128_and_vdc_timing_contracts():
     c128 = read("src/c128/c128.h")
     vdc = read("src/vdc/vdc.h")
