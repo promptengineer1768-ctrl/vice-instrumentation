@@ -43,6 +43,7 @@
 #include "serial.h"
 #include "drive/iec/cmdhd.h"
 #include "maincpu.h"
+#include "drivetypes.h"
 
 #ifdef DEBUG_IECBUS
 #include "log.h"
@@ -66,6 +67,38 @@ iecbus_observer_t iecbus_observer = NULL;
  * snapshot synchronously, preserving the callback lifetime contract. */
 static FILE *iecbus_trace_file;
 
+/* The IEC bus observer runs at line-resolution, while the drive ROM does not
+ * publish symbolic routine names.  Keep the semantic label deliberately
+ * conservative: it is a line-level hint, and the raw PC/register context is
+ * emitted alongside it so consumers can build a ROM-specific classifier. */
+static const char *iecbus_semantic_hint(unsigned int unit, const iecbus_t *state)
+{
+    uint8_t out;
+
+    if (unit >= NUM_DISK_UNITS || diskunit_context[unit] == NULL) {
+        return "passive";
+    }
+    out = state->drv_bus[unit];
+    if (out == 0xffu) {
+        return "passive";
+    }
+    /* ATN asserted with ATNA asserted is the selection/listening phase. */
+    if (!(state->cpu_port & IECBUS_DEVICE_READ_ATN)
+        && (out & IECBUS_DEVICE_ATNA)) {
+        return "selected";
+    }
+    /* An active DATA output while ATN is released is a sender.  Otherwise the
+     * drive is participating as a receiver/acknowledger; ACK is retained as a
+     * distinct hint when DATA is pulled low during a CLK-high interval. */
+    if ((out & IECBUS_DEVICE_WRITE_DATA) == 0u) {
+        if ((state->drv_port & IECBUS_DEVICE_READ_CLK) != 0u) {
+            return "acknowledging";
+        }
+        return "sending";
+    }
+    return "receiving";
+}
+
 static void iecbus_trace_observer(const iecbus_t *state)
 {
     unsigned int unit;
@@ -86,6 +119,27 @@ static void iecbus_trace_observer(const iecbus_t *state)
     fputs("] ,\"drv_data\":[", iecbus_trace_file);
     for (unit = 0; unit < IECBUS_NUM; unit++) {
         fprintf(iecbus_trace_file, "%s%u", unit ? "," : "", (unsigned int)state->drv_data[unit]);
+    }
+    fputs("] ,\"drive_context\":[", iecbus_trace_file);
+    for (unit = 0; unit < IECBUS_NUM; unit++) {
+        diskunit_context_t *drive = (unit < NUM_DISK_UNITS)
+                                    ? diskunit_context[unit] : NULL;
+        if (unit) {
+            fputc(',', iecbus_trace_file);
+        }
+        if (drive == NULL || drive->cpu == NULL) {
+            fprintf(iecbus_trace_file,
+                    "{\"unit\":%u,\"semantic\":\"passive\",\"pc\":null}",
+                    unit + 8u);
+        } else {
+            fprintf(iecbus_trace_file,
+                    "{\"unit\":%u,\"semantic\":\"%s\",\"pc\":%u,\"a\":%u,\"x\":%u,\"y\":%u}",
+                    unit + 8u, iecbus_semantic_hint(unit, state),
+                    (unsigned int)drive->cpu->cpu_regs.pc,
+                    (unsigned int)drive->cpu->cpu_regs.a,
+                    (unsigned int)drive->cpu->cpu_regs.x,
+                    (unsigned int)drive->cpu->cpu_regs.y);
+        }
     }
     fputs("]}\n", iecbus_trace_file);
     fflush(iecbus_trace_file);

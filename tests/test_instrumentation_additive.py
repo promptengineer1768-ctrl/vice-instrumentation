@@ -24,6 +24,15 @@ def test_observer_changes_are_additive():
                  "src/monitor/monitor_binary.c"):
         assert path in changed
 
+def test_iec_recorder_exposes_raw_drive_context_and_inferred_semantics():
+    source = (ROOT / "src" / "iecbus" / "iecbus.c").read_text(encoding="utf-8")
+    for field in ("drive_context", "semantic", "cpu_regs.pc", "cpu_regs.a",
+                  "cpu_regs.x", "cpu_regs.y"):
+        assert field in source
+    # The implementation must document that labels are hints, not ROM symbols.
+    docs = (ROOT / "doc" / "iec-jsonl-recorder.txt").read_text(encoding="utf-8")
+    assert "line-level hints" in docs
+
 def test_pristine_branch_is_ancestor():
     if subprocess.call(["git", "rev-parse", "--verify", "upstream/v3.10.0"], cwd=ROOT,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
