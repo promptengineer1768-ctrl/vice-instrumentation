@@ -77,6 +77,7 @@ jobs:
           mkdir -p "$HOME/bin"
           cp "$RUNNER_TEMP/xa/xa/xa" "$HOME/bin/xa"
           export PATH="$HOME/bin:$PATH"
+          export ICONV=true
           ./configure --without-libcurl --disable-gtk3
           make -j2
       - name: Package Windows binaries
