@@ -65,6 +65,7 @@ jobs:
             mingw-w64-x86_64-SDL2_image
             mingw-w64-x86_64-gtk3
             mingw-w64-x86_64-libpng
+            mingw-w64-x86_64-libiconv
             mingw-w64-x86_64-zlib
             flex
       - name: Configure and build
@@ -106,7 +107,7 @@ jobs:
       - name: Configure and build
         run: |
           chmod +x configure
-          ./configure --without-libcurl --disable-gtk3
+          ./configure --without-libcurl --disable-gtk3 --disable-dependency-tracking
           make -j2
       - name: Package macOS binaries
         run: |
