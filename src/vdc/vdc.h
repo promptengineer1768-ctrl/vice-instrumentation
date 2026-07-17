@@ -31,6 +31,19 @@
 
 #include "types.h"
 
+typedef struct vdc_timing_sample_s {
+    CLOCK clock;
+    CLOCK busy_until;
+    unsigned int raster_line;
+    unsigned int raster_ycounter;
+    unsigned int register_index;
+    unsigned int memory_counter;
+    unsigned int draw_active;
+    unsigned int display_enable;
+} vdc_timing_sample_t;
+
+void vdc_get_timing_sample(vdc_timing_sample_t *sample);
+
 #define VDC_REVISION_0  0 /* 8563 R7A */
 #define VDC_REVISION_1  1 /* 8563 R8/R9 */
 #define VDC_REVISION_2  2 /* 8568 */

@@ -49,10 +49,10 @@
 #include "vdc-cmdline-options.h"
 #include "vdc-color.h"
 #include "vdc-draw.h"
-#include "vdc-mem.h"
 #include "vdc-resources.h"
 #include "vdc-snapshot.h"
 #include "vdc.h"
+#include "vdc-mem.h"
 #include "vdctypes.h"
 #include "video.h"
 #include "videoarch.h"
@@ -229,6 +229,21 @@ raster_t *vdc_init(void)
 struct video_canvas_s *vdc_get_canvas(void)
 {
     return vdc.raster.canvas;
+}
+
+void vdc_get_timing_sample(vdc_timing_sample_t *sample)
+{
+    if (sample == NULL) {
+        return;
+    }
+    sample->clock = maincpu_clk;
+    sample->busy_until = vdc_busy_until();
+    sample->raster_line = vdc.raster.current_line;
+    sample->raster_ycounter = vdc.raster.ycounter;
+    sample->register_index = (unsigned int)vdc.update_reg;
+    sample->memory_counter = vdc.mem_counter;
+    sample->draw_active = vdc.draw_active;
+    sample->display_enable = vdc.display_enable;
 }
 
 

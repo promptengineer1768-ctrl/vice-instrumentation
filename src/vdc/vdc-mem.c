@@ -48,6 +48,11 @@
 
 static CLOCK vdc_status_clear_clock = 0;
 
+CLOCK vdc_busy_until(void)
+{
+    return vdc_status_clear_clock;
+}
+
 /*#define REG_DEBUG*/
 
 /* bitmask to set the unused bits in returned register values */
