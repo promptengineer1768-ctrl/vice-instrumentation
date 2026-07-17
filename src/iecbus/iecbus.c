@@ -83,8 +83,11 @@ static const char *iecbus_semantic_hint(unsigned int unit, const iecbus_t *state
         return "passive";
     }
     /* ATN asserted with ATNA asserted is the selection/listening phase. */
+    /* drv_bus contains only resolved DATA/CLK output ownership.  ATNA lives
+     * in the model's raw drive port snapshot (drv_data), so testing it in
+     * drv_bus made SELECTED unreachable in recorder output. */
     if (!(state->cpu_port & IECBUS_DEVICE_READ_ATN)
-        && (out & IECBUS_DEVICE_ATNA)) {
+        && (state->drv_data[unit] & IECBUS_DEVICE_ATNA)) {
         return "selected";
     }
     /* An active DATA output while ATN is released is a sender.  Otherwise the

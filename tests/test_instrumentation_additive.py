@@ -33,6 +33,11 @@ def test_iec_recorder_exposes_raw_drive_context_and_inferred_semantics():
     docs = (ROOT / "doc" / "iec-jsonl-recorder.txt").read_text(encoding="utf-8")
     assert "line-level hints" in docs
 
+def test_selected_hint_reads_atna_from_raw_drive_port():
+    source = (ROOT / "src" / "iecbus" / "iecbus.c").read_text(encoding="utf-8")
+    assert "state->drv_data[unit] & IECBUS_DEVICE_ATNA" in source
+    assert "out & IECBUS_DEVICE_ATNA" not in source
+
 def test_pristine_branch_is_ancestor():
     if subprocess.call(["git", "rev-parse", "--verify", "upstream/v3.10.0"], cwd=ROOT,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
