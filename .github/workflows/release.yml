@@ -59,6 +59,8 @@ jobs:
           update: true
           install: >-
             base-devel
+            autoconf
+            automake
             git
             libiconv
             mingw-w64-x86_64-toolchain
