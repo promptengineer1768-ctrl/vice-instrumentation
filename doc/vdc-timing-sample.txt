@@ -1,0 +1,17 @@
+VICE instrumentation VDC timing sample
+
+Native API: vdc_get_timing_sample(vdc_timing_sample_t *sample)
+
+Fields:
+  clock            Main CPU clock at sampling time.
+  busy_until       Main CPU clock at which the current VDC operation is ready.
+  raster_line      VDC raster line (raster.current_line).
+  raster_ycounter  Character-row raster counter.
+  register_index   Currently selected VDC register.
+  memory_counter   Internal VDC video-memory counter.
+  draw_active      Whether the VDC is actively drawing.
+  display_enable   Whether display output is enabled.
+
+To synchronize a VDC store, sample immediately before the operation and wait
+until clock >= busy_until. The value is an emulation deadline, not a host-time
+duration. Samples are read-only and valid for the duration of the call.
