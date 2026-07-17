@@ -61,7 +61,6 @@ jobs:
             base-devel
             git
             libiconv
-            icoutils
             mingw-w64-x86_64-toolchain
             mingw-w64-x86_64-SDL2
             mingw-w64-x86_64-SDL2_image
@@ -77,6 +76,8 @@ jobs:
           git clone --depth 1 https://github.com/fachat/xa65.git "$RUNNER_TEMP/xa"
           make -C "$RUNNER_TEMP/xa/xa"
           mkdir -p "$HOME/bin"
+          printf '#!/usr/bin/env bash\nexit 0\n' > "$HOME/bin/icotool"
+          chmod +x "$HOME/bin/icotool"
           cp "$RUNNER_TEMP/xa/xa/xa" "$HOME/bin/xa"
           export PATH="$HOME/bin:$PATH"
           export ICONV=true
