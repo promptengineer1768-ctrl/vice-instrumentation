@@ -97,7 +97,11 @@ jobs:
           test -f src/x64sc.exe
           test -f src/xvic.exe
           test -f src/xplus4.exe
-          7z a release/vice-3.10-instrumented-windows.zip src/x128.exe src/x64sc.exe src/xvic.exe src/xplus4.exe
+          # Ship the MinGW runtime/SDL DLLs beside the executables. Without
+          # these, a clean Windows machine reports missing libpng/libstdc++
+          # (or fails before the binary monitor can start).
+          cp /mingw64/bin/*.dll .
+          7z a release/vice-3.10-instrumented-windows.zip src/*.exe *.dll
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-windows-${{ github.run_number }}
