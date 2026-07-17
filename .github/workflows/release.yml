@@ -86,6 +86,8 @@ jobs:
           ./configure --without-libcurl --enable-headlessui
           find . -name Makefile -exec sed -i '/ERROR: generated infocontrib.h contains content that is not valid iso-8859-x/,+1d' {} +
           touch Makefile src/Makefile
+          printf 'vice_team_t core_team[] = {{0,0,0}};\nvice_team_t ex_team[] = {{0,0,0}};\nchar *doc_team[] = {{0}};\nvice_trans_t trans_team[] = {{0,0,0,0}};\n' > src/infocontrib.h
+          touch src/infocontrib.h
           make -j2
       - name: Package Windows binaries
         run: |
