@@ -32,7 +32,7 @@ jobs:
           tar -czf release/vice-3.10-instrumented-linux.tar.gz x128 x64sc 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         with:
-          name: vice-3.10-instrumented-${{ github.ref_name }}
+          name: vice-3.10-instrumented-run-${{ github.run_number }}
           path: release/*
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
