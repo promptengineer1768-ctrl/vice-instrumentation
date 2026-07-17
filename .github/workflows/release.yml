@@ -65,6 +65,7 @@ jobs:
             mingw-w64-x86_64-SDL2
             mingw-w64-x86_64-SDL2_image
             mingw-w64-x86_64-gtk3
+            mingw-w64-x86_64-glew
             mingw-w64-x86_64-libpng
             mingw-w64-x86_64-libiconv
             mingw-w64-x86_64-zlib
