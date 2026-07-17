@@ -6,8 +6,10 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - run: git diff --check upstream/v3.10.0...HEAD
+      - run: git fetch origin upstream/v3.10.0:refs/remotes/origin/upstream/v3.10.0
+      - run: git diff --check origin/upstream/v3.10.0...HEAD
+      - run: git branch upstream/v3.10.0 origin/upstream/v3.10.0
       - run: python3 -m pytest -q tests/test_instrumentation_additive.py
