@@ -19,7 +19,7 @@ jobs:
             libgtk-3-dev libsdl2-dev libasound2-dev libpulse-dev libpng-dev zlib1g-dev \
             libreadline-dev
       - name: Configure
-        run: ./configure --enable-sdl2 --disable-gtk3
+        run: chmod +x configure && ./configure --enable-sdl2 --disable-gtk3
       - name: Build
         run: make -j2
       - name: Package source and binaries
