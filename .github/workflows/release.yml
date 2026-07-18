@@ -33,7 +33,10 @@ jobs:
           test -x src/x64sc
           test -x src/xvic
           test -x src/xplus4
-          tar -czf release/vice-3.10-instrumented-linux.tar.gz src/x128 src/x64sc src/xvic src/xplus4
+          test -x src/c1541
+          test -x src/tools/petcat/petcat
+          tar -czf release/vice-3.10-instrumented-linux.tar.gz \
+            src/x128 src/x64sc src/xvic src/xplus4 src/c1541 src/tools/petcat/petcat
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-run-${{ github.run_number }}
@@ -97,11 +100,13 @@ jobs:
           test -f src/x64sc.exe
           test -f src/xvic.exe
           test -f src/xplus4.exe
+          test -f src/c1541.exe
+          test -f src/tools/petcat/petcat.exe
           # Ship the MinGW runtime/SDL DLLs beside the executables. Without
           # these, a clean Windows machine reports missing libpng/libstdc++
           # (or fails before the binary monitor can start).
           cp /mingw64/bin/*.dll .
-          7z a release/vice-3.10-instrumented-windows.zip src/*.exe *.dll
+          7z a release/vice-3.10-instrumented-windows.zip src/*.exe src/tools/petcat/petcat.exe *.dll
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-windows-${{ github.run_number }}
@@ -136,7 +141,10 @@ jobs:
           test -x src/x64sc
           test -x src/xvic
           test -x src/xplus4
-          tar -czf release/vice-3.10-instrumented-macos.tar.gz src/x128 src/x64sc src/xvic src/xplus4
+          test -x src/c1541
+          test -x src/tools/petcat/petcat
+          tar -czf release/vice-3.10-instrumented-macos.tar.gz \
+            src/x128 src/x64sc src/xvic src/xplus4 src/c1541 src/tools/petcat/petcat
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-macos-${{ github.run_number }}
