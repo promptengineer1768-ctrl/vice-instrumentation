@@ -99,7 +99,19 @@ jobs:
           mkdir -p release
           # VICE's native Windows bindist includes all headless emulators,
           # c1541, cartconv and petcat, their runtime DLLs, and system data.
-          make bindistzip
+          # The Makefile target passes relative paths for an in-tree build;
+          # invoke the upstream script directly with absolute paths instead.
+          "$(pwd)/src/arch/headless/make-bindist_win32.sh" \
+            --verbose \
+            --compiler-exe cc \
+            --objdump-exe objdump \
+            --strip-exe strip \
+            --vice-version 3.10 \
+            --enable-arch yes \
+            --src-dir "$(pwd)" \
+            --build-dir "$(pwd)" \
+            --cpu-type x86_64 \
+            --zip-type zip
           zip_file=$(find . -maxdepth 1 -type f -name '*.zip' -print -quit)
           test -n "$zip_file"
           7z l "$zip_file" | grep -q 'c1541.exe'
