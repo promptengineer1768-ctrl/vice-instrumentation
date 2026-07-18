@@ -29,14 +29,13 @@ jobs:
         run: |
           mkdir -p release
           git archive --format=tar.gz --prefix=vice-3.10-instrumented/ HEAD > release/vice-3.10-instrumented-source.tar.gz
-          test -x src/x128
-          test -x src/x64sc
-          test -x src/xvic
-          test -x src/xplus4
-          test -x src/c1541
-          test -x src/tools/petcat/petcat
-          tar -czf release/vice-3.10-instrumented-linux.tar.gz \
-            src/x128 src/x64sc src/xvic src/xplus4 src/c1541 src/tools/petcat/petcat
+          # Use VICE's native install target so the archive contains every
+          # configured executable and the data files it needs at runtime.
+          make install DESTDIR="$PWD/release/stage"
+          test -x release/stage/usr/local/bin/c1541
+          test -x release/stage/usr/local/bin/cartconv
+          test -x release/stage/usr/local/bin/petcat
+          tar -C release/stage -czf release/vice-3.10-instrumented-linux.tar.gz usr
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-run-${{ github.run_number }}
@@ -96,17 +95,15 @@ jobs:
       - name: Package Windows binaries
         run: |
           mkdir -p release
-          test -f src/x128.exe
-          test -f src/x64sc.exe
-          test -f src/xvic.exe
-          test -f src/xplus4.exe
-          test -f src/c1541.exe
-          test -f src/tools/petcat/petcat.exe
-          # Ship the MinGW runtime/SDL DLLs beside the executables. Without
-          # these, a clean Windows machine reports missing libpng/libstdc++
-          # (or fails before the binary monitor can start).
-          cp /mingw64/bin/*.dll .
-          7z a release/vice-3.10-instrumented-windows.zip src/*.exe src/tools/petcat/petcat.exe *.dll
+          # VICE's native Windows bindist includes all headless emulators,
+          # c1541, cartconv and petcat, their runtime DLLs, and system data.
+          make bindistzip
+          zip_file=$(find . -maxdepth 1 -type f -name '*.zip' -print -quit)
+          test -n "$zip_file"
+          7z l "$zip_file" | grep -q 'c1541.exe'
+          7z l "$zip_file" | grep -q 'cartconv.exe'
+          7z l "$zip_file" | grep -q 'petcat.exe'
+          mv "$zip_file" release/vice-3.10-instrumented-windows.zip
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-windows-${{ github.run_number }}
@@ -137,14 +134,13 @@ jobs:
       - name: Package macOS binaries
         run: |
           mkdir -p release
-          test -x src/x128
-          test -x src/x64sc
-          test -x src/xvic
-          test -x src/xplus4
-          test -x src/c1541
-          test -x src/tools/petcat/petcat
-          tar -czf release/vice-3.10-instrumented-macos.tar.gz \
-            src/x128 src/x64sc src/xvic src/xplus4 src/c1541 src/tools/petcat/petcat
+          # Use VICE's native install target so the archive contains every
+          # configured executable and the data files it needs at runtime.
+          make install DESTDIR="$PWD/release/stage"
+          test -x release/stage/usr/local/bin/c1541
+          test -x release/stage/usr/local/bin/cartconv
+          test -x release/stage/usr/local/bin/petcat
+          tar -C release/stage -czf release/vice-3.10-instrumented-macos.tar.gz usr
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-macos-${{ github.run_number }}
