@@ -31,6 +31,7 @@ jobs:
           git archive --format=tar.gz --prefix=vice-3.10-instrumented/ HEAD > release/vice-3.10-instrumented-source.tar.gz
           # Use VICE's native install target so the archive contains every
           # configured executable and the data files it needs at runtime.
+          chmod +x install-sh
           make install DESTDIR="$PWD/release/stage"
           bindir=$(dirname "$(find release/stage -type f -name c1541 -print -quit)")
           test -x "$bindir/c1541"
@@ -137,6 +138,7 @@ jobs:
           mkdir -p release
           # Use VICE's native install target so the archive contains every
           # configured executable and the data files it needs at runtime.
+          chmod +x install-sh
           make install DESTDIR="$PWD/release/stage"
           bindir=$(dirname "$(find release/stage -type f -name c1541 -print -quit)")
           test -x "$bindir/c1541"
