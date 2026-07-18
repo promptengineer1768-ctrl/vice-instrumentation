@@ -32,10 +32,11 @@ jobs:
           # Use VICE's native install target so the archive contains every
           # configured executable and the data files it needs at runtime.
           make install DESTDIR="$PWD/release/stage"
-          test -x release/stage/usr/local/bin/c1541
-          test -x release/stage/usr/local/bin/cartconv
-          test -x release/stage/usr/local/bin/petcat
-          tar -C release/stage -czf release/vice-3.10-instrumented-linux.tar.gz usr
+          bindir=$(dirname "$(find release/stage -type f -name c1541 -print -quit)")
+          test -x "$bindir/c1541"
+          test -x "$bindir/cartconv"
+          test -x "$bindir/petcat"
+          tar -C release/stage -czf release/vice-3.10-instrumented-linux.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-run-${{ github.run_number }}
@@ -137,10 +138,11 @@ jobs:
           # Use VICE's native install target so the archive contains every
           # configured executable and the data files it needs at runtime.
           make install DESTDIR="$PWD/release/stage"
-          test -x release/stage/usr/local/bin/c1541
-          test -x release/stage/usr/local/bin/cartconv
-          test -x release/stage/usr/local/bin/petcat
-          tar -C release/stage -czf release/vice-3.10-instrumented-macos.tar.gz usr
+          bindir=$(dirname "$(find release/stage -type f -name c1541 -print -quit)")
+          test -x "$bindir/c1541"
+          test -x "$bindir/cartconv"
+          test -x "$bindir/petcat"
+          tar -C release/stage -czf release/vice-3.10-instrumented-macos.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-macos-${{ github.run_number }}
