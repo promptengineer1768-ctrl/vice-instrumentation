@@ -64,6 +64,7 @@ jobs:
           install: >-
             base-devel
             p7zip
+            zip
             autoconf
             automake
             git
@@ -76,6 +77,7 @@ jobs:
             mingw-w64-x86_64-libpng
             mingw-w64-x86_64-libiconv
             mingw-w64-x86_64-zlib
+            mingw-w64-x86_64-ntldd
             flex
       - name: Configure and build
         run: |
