@@ -1316,7 +1316,8 @@ static void monitor_binary_process_display_get(binary_command_t *command)
     screenshot.y_offset = screenshot.first_displayed_line;
 
     buffer_length = screenshot.debug_width * screenshot.debug_height * depth / 8;
-    response_length = 4 + info_length + buffer_length;
+    /* info_length excludes this uint32 buffer-length field. */
+    response_length = 4 + info_length + 4 + buffer_length;
     response = lib_malloc(response_length);
     response_cursor = response;
 
