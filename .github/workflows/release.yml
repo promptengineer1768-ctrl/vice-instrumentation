@@ -144,6 +144,7 @@ jobs:
           chmod +x configure
           mkdir -p "$HOME/bin"
           ln -sf "$(brew --prefix automake)/bin/aclocal" "$HOME/bin/aclocal-1.16"
+          ln -sf "$(brew --prefix automake)/bin/automake" "$HOME/bin/automake-1.16"
           export PATH="$HOME/bin:$PATH"
           ./configure --without-libcurl --disable-gtk3 --disable-dependency-tracking
           make -j2
