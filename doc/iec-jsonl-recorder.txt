@@ -17,8 +17,12 @@ Drive semantic context
 ----------------------
 
 Each record also contains `drive_context`, one object per recorder drive slot.
-The object includes the drive CPU's current `pc`, `a`, `x`, and `y` registers,
-and a `semantic` hint.  The hint values are `passive`, `selected`,
+The object includes the drive CPU's authoritative `cycle` counter, current `pc`,
+`a`, `x`, and `y` registers, and a `semantic` hint.  `cycle` is read from the
+drive context's `clk_ptr` in the drive CPU clock domain; it is `null` when no
+drive CPU exists for that slot.  Pair it with the record's host `clock` to
+measure host/drive ratios, phase drift, and cross-domain timing uncertainty.
+The hint values are `passive`, `selected`,
 `receiving`, `acknowledging`, or `sending`.  These are line-level hints derived
 from ATN/ATNA, DATA, and CLK—not symbolic ROM routine identification.  VICE
 3.10 does not carry a ROM symbol table through the IEC observer, so a consumer
@@ -26,3 +30,7 @@ must correlate `pc` with the exact drive ROM image to promote a hint to a
 ROM-semantic state.  `passive` is exact for an undriven output; the other four
 labels are explicitly *inferred* and may be `receiving`/`acknowledging`
 ambiguous for custom ROMs.  Raw register and bus values remain authoritative.
+
+Drive contexts use internal slots zero through three for CPU lookup but report
+IEC units 8 through 11.  Semantic line ownership therefore reads `drv_bus` and
+`drv_data` at the reported IEC unit index, not at the internal slot index.

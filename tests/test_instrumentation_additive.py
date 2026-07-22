@@ -33,10 +33,23 @@ def test_iec_recorder_exposes_raw_drive_context_and_inferred_semantics():
     docs = (ROOT / "doc" / "iec-jsonl-recorder.txt").read_text(encoding="utf-8")
     assert "line-level hints" in docs
 
+def test_iec_recorder_exposes_authoritative_drive_cycle():
+    source = (ROOT / "src" / "iecbus" / "iecbus.c").read_text(encoding="utf-8")
+    docs = (ROOT / "doc" / "iec-jsonl-recorder.txt").read_text(encoding="utf-8")
+    assert '\\"cycle\\":%llu' in source
+    assert "*(drive->clk_ptr)" in source
+    assert "host/drive ratios" in docs
+    assert "unit < NUM_DISK_UNITS" in source
+
 def test_selected_hint_reads_atna_from_raw_drive_port():
     source = (ROOT / "src" / "iecbus" / "iecbus.c").read_text(encoding="utf-8")
-    assert "state->drv_data[unit] & IECBUS_DEVICE_ATNA" in source
+    assert "state->drv_data[bus_unit] & IECBUS_DEVICE_ATNA" in source
     assert "out & IECBUS_DEVICE_ATNA" not in source
+
+def test_semantic_hint_translates_drive_slot_to_iec_unit():
+    source = (ROOT / "src" / "iecbus" / "iecbus.c").read_text(encoding="utf-8")
+    assert "bus_unit = unit + 8u" in source
+    assert "state->drv_bus[bus_unit]" in source
 
 def test_pristine_branch_is_ancestor():
     if subprocess.call(["git", "rev-parse", "--verify", "upstream/v3.10.0"], cwd=ROOT,
