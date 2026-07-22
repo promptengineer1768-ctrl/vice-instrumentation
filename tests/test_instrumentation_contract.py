@@ -17,9 +17,8 @@ def test_keyboard_extension_contract():
 
 def test_restore_pseudo_cells_bypass_headless_host_keysyms():
     source = read("src/monitor/monitor_binary.c")
-    assert "keyboard_custom_key_set(KBD_CUSTOM_RESTORE1, pressed)" in source
-    assert "keyboard_custom_key_set(KBD_CUSTOM_RESTORE2, pressed)" in source
-    assert "normal\n         * delayed RESTORE alarm" in source
+    assert source.count("machine_set_restore_key(pressed);") == 2
+    assert "Binary-monitor commands execute while emulation is stopped" in source
 
 
 def test_iec_observer_contract():

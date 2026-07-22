@@ -803,13 +803,14 @@ static void monitor_binary_process_keyboard_matrix(binary_command_t *command)
     }
 
     if (row == KBD_ROW_RESTORE_1 && col == KBD_COL_RESTORE_1) {
-        /* Do not translate RESTORE through a host keysym.  Headless builds
-         * may leave that mapping unset, and multiple unset custom keys can
-         * share -1.  The explicit custom-key state still uses VICE's normal
-         * delayed RESTORE alarm and machine_set_restore_key() NMI path. */
-        keyboard_custom_key_set(KBD_CUSTOM_RESTORE1, pressed);
+        /* Binary-monitor commands execute while emulation is stopped.  The
+         * ordinary keyboard path schedules RESTORE on the emulated clock, so
+         * a press followed by a monitor release can cancel it before that
+         * clock advances.  Assert the machine signal synchronously; the NMI
+         * remains pending and is observed when the monitor resumes. */
+        machine_set_restore_key(pressed);
     } else if (row == KBD_ROW_RESTORE_2 && col == KBD_COL_RESTORE_2) {
-        keyboard_custom_key_set(KBD_CUSTOM_RESTORE2, pressed);
+        machine_set_restore_key(pressed);
     } else {
         keyboard_set_keyarr_any(row, col, pressed);
     }

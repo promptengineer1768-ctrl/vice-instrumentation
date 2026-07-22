@@ -9,8 +9,8 @@ Request body (3 bytes):
   byte 2: pressed (zero release, nonzero press)
 
 Rows 0..15 address keyboard matrix rows.  RESTORE is row -3, column 0 or 1.
-RESTORE pseudo-cells select the registered RESTORE custom key directly, so
-headless builds do not depend on a host keysym mapping.  They retain VICE's
-normal delayed RESTORE alarm and therefore generate the machine's NMI path.
+RESTORE pseudo-cells assert the machine RESTORE signal synchronously, so
+headless builds do not depend on a host keysym mapping and the NMI is not lost
+while binary-monitor command processing has emulation stopped.
 The command uses VICE's normal keyboard event path, including asynchronous
 queueing and machine-specific RESTORE behavior.
