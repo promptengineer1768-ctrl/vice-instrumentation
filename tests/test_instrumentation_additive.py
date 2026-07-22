@@ -57,3 +57,11 @@ def test_pristine_branch_is_ancestor():
         pytest.skip("upstream branch is available in the development checkout only")
     subprocess.check_call(["git", "merge-base", "--is-ancestor",
                            "upstream/v3.10.0", "HEAD"], cwd=ROOT)
+
+
+def test_macos_launcher_declares_executable_path_api():
+    source = (ROOT / "src" / "arch" / "shared" / "macOS-launcher.c").read_text(
+        encoding="utf-8"
+    )
+    assert "#include <mach-o/dyld.h>" in source
+    assert "_NSGetExecutablePath" in source
