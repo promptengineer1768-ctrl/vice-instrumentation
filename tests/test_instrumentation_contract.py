@@ -43,3 +43,9 @@ def test_c128_and_vdc_timing_contracts():
     assert "c128_get_timing_sample" in c128
     assert "vdc_get_timing_sample" in vdc
     assert "busy_until" in vdc_docs
+
+
+def test_windows_release_is_portable_across_consumer_cpus():
+    workflow = read(".github/workflows/release.yml")
+    assert "--enable-headlessui --disable-arch" in workflow
+    assert "--enable-arch no" in workflow

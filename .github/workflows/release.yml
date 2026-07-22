@@ -92,7 +92,10 @@ jobs:
           cp "$RUNNER_TEMP/xa/xa/xa" "$HOME/bin/xa"
           export PATH="$HOME/bin:$PATH"
           export ICONV=true
-          ./configure --without-libcurl --enable-headlessui
+          # Release binaries run on consumer machines, not just the Actions host.
+          # VICE defaults to -march=native, which produced AVX instructions on the
+          # hosted runner and 0xC000001D on older Windows CPUs.
+          ./configure --without-libcurl --enable-headlessui --disable-arch
           find . -name Makefile -exec sed -i '/ERROR: generated infocontrib.h contains content that is not valid iso-8859-x/,+1d' {} +
           touch Makefile src/Makefile
           printf 'vice_team_t core_team[] = {{0,0,0}};\nvice_team_t ex_team[] = {{0,0,0}};\nchar *doc_team[] = {{0}};\nvice_trans_t trans_team[] = {{0,0,0,0}};\n' > src/infocontrib.h
@@ -111,7 +114,7 @@ jobs:
             --objdump-exe objdump \
             --strip-exe strip \
             --vice-version 3.10 \
-            --enable-arch yes \
+            --enable-arch no \
             --src-dir "$(pwd)" \
             --build-dir "$(pwd)" \
             --cpu-type x86_64 \
