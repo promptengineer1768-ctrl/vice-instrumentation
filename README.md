@@ -1,6 +1,6 @@
-# VICE 3.10 Instrumentation Extension
+# vice-instrumented
 
-This branch contains a small, reviewable instrumentation layer on top of the
+`vice-instrumented` is a small, reviewable instrumentation layer on top of the
 official VICE 3.10.0 source release. The pristine release is preserved in the
 `upstream/v3.10.0` branch; changes live on `work/instrumentation`.
 

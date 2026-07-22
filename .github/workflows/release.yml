@@ -1,8 +1,10 @@
-name: VICE instrumentation release
+name: vice-instrumented build
+run-name: vice-instrumented build (${{ github.ref_name }})
 on:
   workflow_dispatch:
-  push:
-    tags: ['v*']
+concurrency:
+  group: vice-instrumented-build-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -28,7 +30,7 @@ jobs:
       - name: Package source and binaries
         run: |
           mkdir -p release
-          git archive --format=tar.gz --prefix=vice-3.10-instrumented/ HEAD > release/vice-3.10-instrumented-source.tar.gz
+          git archive --format=tar.gz --prefix=vice-instrumented-3.10/ HEAD > release/vice-instrumented-3.10-source.tar.gz
           # Use VICE's native install target so the archive contains every
           # configured executable and the data files it needs at runtime.
           chmod +x install-sh
@@ -37,10 +39,10 @@ jobs:
           test -x "$bindir/c1541"
           test -x "$bindir/cartconv"
           test -x "$bindir/petcat"
-          tar -C release/stage -czf release/vice-3.10-instrumented-linux.tar.gz .
+          tar -C release/stage -czf release/vice-instrumented-3.10-linux.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
-          name: vice-3.10-instrumented-run-${{ github.run_number }}
+          name: vice-instrumented-linux-${{ github.run_number }}
           path: release/*
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -122,16 +124,16 @@ jobs:
           mkdir -p release/windows-tools
           cp tools/vice_session.py README.md release/windows-tools/
           (cd release/windows-tools && zip -r ../vice-session-tools.zip .)
-          mv "$zip_file" release/vice-3.10-instrumented-windows.zip
+          mv "$zip_file" release/vice-instrumented-3.10-windows.zip
       - name: Verify Windows deliverables
         shell: pwsh
         run: |
-          if (-not (Test-Path release/vice-3.10-instrumented-windows.zip)) { throw "VICE archive missing" }
+          if (-not (Test-Path release/vice-instrumented-3.10-windows.zip)) { throw "VICE archive missing" }
           if (-not (Test-Path release/vice-session-tools.zip)) { throw "session tools archive missing" }
           python tools/vice_session.py --help | Out-Null
       - uses: actions/upload-artifact@v4
         with:
-          name: vice-3.10-instrumented-windows-${{ github.run_number }}
+          name: vice-instrumented-windows-${{ github.run_number }}
           path: release/*
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -168,10 +170,10 @@ jobs:
           test -x "$bindir/c1541"
           test -x "$bindir/cartconv"
           test -x "$bindir/petcat"
-          tar -C release/stage -czf release/vice-3.10-instrumented-macos.tar.gz .
+          tar -C release/stage -czf release/vice-instrumented-3.10-macos.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
-          name: vice-3.10-instrumented-macos-${{ github.run_number }}
+          name: vice-instrumented-macos-${{ github.run_number }}
           path: release/*
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2

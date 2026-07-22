@@ -1,4 +1,4 @@
-name: VICE instrumentation audit
+name: vice-instrumented audit
 on:
   push:
   pull_request:

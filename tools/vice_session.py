@@ -119,7 +119,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--vice", required=True, help="instrumented VICE executable")
     value.add_argument(
         "--session-root",
-        default=str(Path(tempfile.gettempdir()) / "vice-instrumentation-sessions"),
+        default=str(Path(tempfile.gettempdir()) / "vice-instrumented-sessions"),
     )
     value.add_argument("--session-id")
     value.add_argument("--port", type=int, default=0)
