@@ -27,6 +27,23 @@ Build VICE using the normal 3.10 prerequisites and platform instructions. The
 source tree is a normal VICE checkout; run `./configure`, then `make` (or the
 native Windows build procedure). The extension does not require the MCP server.
 
+## Parallel instrumented sessions
+
+`tools/vice_session.py` starts one emulator with an operating-system-assigned
+loopback monitor port and a private configuration, log, stdout, stderr, and
+session manifest directory. It records the exact child PID and terminates only
+that child when interrupted; it never searches for or kills unrelated VICE
+processes. Pass emulator arguments after the launcher options:
+
+```text
+python tools/vice_session.py --vice path/to/x64sc.exe --keep -- -warp game.d64
+```
+
+Use `--port` only when an external controller already owns a unique port. The
+default `0` allocation is the safe choice for parallel workers. Successful
+sessions are removed unless `--keep` is supplied; failures always retain their
+logs and `session.json` evidence.
+
 ## Protocol reference
 
 See [`doc/binary-monitor-keyboard-matrix.txt`](doc/binary-monitor-keyboard-matrix.txt)

@@ -119,7 +119,16 @@ jobs:
           7z l "$zip_file" | grep -q 'c1541.exe'
           7z l "$zip_file" | grep -q 'cartconv.exe'
           7z l "$zip_file" | grep -q 'petcat.exe'
+          mkdir -p release/windows-tools
+          cp tools/vice_session.py README.md release/windows-tools/
+          (cd release/windows-tools && zip -r ../vice-session-tools.zip .)
           mv "$zip_file" release/vice-3.10-instrumented-windows.zip
+      - name: Verify Windows deliverables
+        shell: pwsh
+        run: |
+          if (-not (Test-Path release/vice-3.10-instrumented-windows.zip)) { throw "VICE archive missing" }
+          if (-not (Test-Path release/vice-session-tools.zip)) { throw "session tools archive missing" }
+          python tools/vice_session.py --help | Out-Null
       - uses: actions/upload-artifact@v4
         with:
           name: vice-3.10-instrumented-windows-${{ github.run_number }}
