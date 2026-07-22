@@ -802,7 +802,17 @@ static void monitor_binary_process_keyboard_matrix(binary_command_t *command)
         return;
     }
 
-    keyboard_set_keyarr_any(row, col, pressed);
+    if (row == KBD_ROW_RESTORE_1 && col == KBD_COL_RESTORE_1) {
+        /* Do not translate RESTORE through a host keysym.  Headless builds
+         * may leave that mapping unset, and multiple unset custom keys can
+         * share -1.  The explicit custom-key state still uses VICE's normal
+         * delayed RESTORE alarm and machine_set_restore_key() NMI path. */
+        keyboard_custom_key_set(KBD_CUSTOM_RESTORE1, pressed);
+    } else if (row == KBD_ROW_RESTORE_2 && col == KBD_COL_RESTORE_2) {
+        keyboard_custom_key_set(KBD_CUSTOM_RESTORE2, pressed);
+    } else {
+        keyboard_set_keyarr_any(row, col, pressed);
+    }
     monitor_binary_response(0, e_MON_RESPONSE_KEYBOARD_MATRIX, e_MON_ERR_OK,
                             command->request_id, NULL);
 }
